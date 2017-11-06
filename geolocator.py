@@ -3,7 +3,8 @@ import subprocess
 import re
 import json
 
-def getWifiData():
+
+def get_wifi_data():
     cmd = ['/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport', '-s']
 
     output = str(subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0])
@@ -13,15 +14,16 @@ def getWifiData():
     for i in wifiData:
         wifiList.append({"macAddress": i[0],
                          "signalStrength": i[1],
-                         "channel": i[2]})
+                         "channel": i[2],
+                         })
 
     return wifiList
 
 
-def getLocation(wifiList):
-    url = "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyDDGDhUvXFgz_x5BaUKRJYIGVEebkcEm_o"
+def get_location(wifi_list = get_wifi_data()):
+    url = 'https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyDDGDhUvXFgz_x5BaUKRJYIGVEebkcEm_o'
 
-    body = {"considerIp": "true", "wifiAccessPoints": wifiList}
+    body = {'considerIp': 'true', 'wifiAccessPoints': wifi_list}
 
     response = json.loads(requests.post(url, json=body).text)
     return response['location']
