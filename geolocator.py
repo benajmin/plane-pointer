@@ -9,16 +9,15 @@ def get_wifi_data():
     cmd = ['/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport', '-s']
 
     output = str(subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0])
-    wifiData = re.findall('((?:[0-9 a-f]{2}[:]){5}[0-9 a-f]{2})\s*(-?\d+)\s*(\d+)', output)
+    wifi_data = re.findall('((?:[0-9 a-f]{2}[:]){5}[0-9 a-f]{2})\s*(-?\d+)\s*(\d+)', output)
 
-    wifiList = []
-    for i in wifiData:
-        wifiList.append({"macAddress": i[0],
-                         "signalStrength": i[1],
-                         "channel": i[2],
-                         })
-
-    return wifiList
+    wifi_list = []
+    for i in wifi_data:
+        wifi_list.append({"macAddress": i[0],
+                          "signalStrength": i[1],
+                          "channel": i[2],
+                          })
+    return wifi_list
 
 
 def get_location(wifi_list = get_wifi_data()):
@@ -52,4 +51,3 @@ def direction(c1, c2):
     x = math.cos(phi1) * math.sin(phi2) - math.sin(phi1) * math.cos(phi2) * math.cos(delta_lambda);
 
     return math.degrees(math.atan2(y, x))
-    
