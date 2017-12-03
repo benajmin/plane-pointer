@@ -74,16 +74,25 @@ void displayPlane(){
   lcd.setCursor(0,0);
 
   switch (state) {
-    case 0: 
-      lcd.print(model);
-      break;
-    case 1:
-      lcd.print(op);
-      break;
+    case 0:
+      if (strlen(to) != 0 && strlen(from) != 0){
+        lcd.print(from);
+        lcd.write(byte(0)); //arrow
+        lcd.print(to);
+        break;
+      }
+    case 1: 
+      if (strlen(model) != 0){
+        lcd.print(model);
+        break;
+      }
     case 2:
-      lcd.print(from);
-      lcd.write(byte(0)); //arrow
-      lcd.print(to);
+      if (strlen(op) != 0){
+        lcd.print(op);
+        break;
+      }
+    default: 
+      lcd.print("Plane Pointer");
       break;
   }
   
