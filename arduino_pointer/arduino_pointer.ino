@@ -21,12 +21,14 @@ LiquidCrystal_I2C lcd(0x3F, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
 Servo yaw_servo;
 Servo pitch_servo;
 
-char model[17] = "2010 CESSNA 525A";
-char op[17] = "DELTA AIR LINES ";
-char to[16] = "New York";
-char from[16] = "Seattle";
-unsigned int alt = 43219;
-float dist = 20.05;
+String serialData;
+
+String model;
+String op;
+String to;
+String from;
+unsigned int alt;
+float dist;
 
 byte arrow[8] = {
   B00000,
@@ -44,8 +46,8 @@ void setup() {
   pitch_servo.attach(PITCH_SERVO_PIN);
 
   Serial.begin(9600);
+  
   lcd.begin(16, 2);
-
   lcd.backlight();
   lcd.createChar(0, arrow);
 
@@ -53,6 +55,10 @@ void setup() {
   lcd.print("Plane Pointer");
   lcd.setCursor(0, 1);
   lcd.print("Benjamin Wilkins");
+
+  // Point "North"
+  yaw_servo.write(0);
+  pitch_servo.write(0);
   delay(5000);
 }
 
@@ -69,25 +75,55 @@ void loop() {
   }
 }
 
+void serialEvent() {
+  serialData = Serial.readString();
+  model = parse(serialData, "<Mdl>", "<");
+  op = parse(serialData, "<Op>", "<");
+  to = parse(serialData, "<To>", "<");
+  from = parse(serialData, "<From>", "<");
+
+  alt =  parse(serialData, "<Alt>", "<").toInt();
+  dist =  parse(serialData, "<Dst>", "<").toFloat();
+
+  int pitch = parse(serialData, "<Pitch>", "<").toInt();
+  int yaw = parse(serialData, "<Yaw>", "<").toInt();
+
+  if (yaw < 0){
+    yaw *= -1;
+  }else{
+    yaw = 180 - yaw;
+    pitch = 180 - pitch;
+  }
+
+  yaw_servo.write(yaw);
+  pitch_servo.write(pitch);
+}
+
+String parse (String input, String d1, String d2){
+  int start = input.indexOf(d1) + d1.length();
+  int finish = input.indexOf(d2, start) + d2.length();
+  return input.substring(start, finish-1);
+}
+
 void displayPlane(){
   lcd.clear();
   lcd.setCursor(0,0);
 
   switch (state) {
     case 0:
-      if (strlen(to) != 0 && strlen(from) != 0){
+      if (to.length() != 0 && from.length() != 0){
         lcd.print(from);
         lcd.write(byte(0)); //arrow
         lcd.print(to);
         break;
       }
     case 1: 
-      if (strlen(model) != 0){
+      if (model.length() != 0){
         lcd.print(model);
         break;
       }
     case 2:
-      if (strlen(op) != 0){
+      if (op.length() != 0){
         lcd.print(op);
         break;
       }
