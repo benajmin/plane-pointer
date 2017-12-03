@@ -35,7 +35,7 @@ def dist(c1, c2):
     phi1 = math.radians(c1['lat'])
     phi2 = math.radians(c2['lat'])
     delta_phi = phi1 - phi2
-    delta_lambda = math.radians(c1['long']-c2['long'])
+    delta_lambda = math.radians(c1['lng']-c2['lng'])
     a = math.sin(delta_phi/2)**2 + math.cos(phi1)*math.cos(phi2)*(math.sin(delta_lambda/2)**2)
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
     return r*c
@@ -45,9 +45,10 @@ def dist(c1, c2):
 def direction(c1, c2):
     phi1 = math.radians(c1['lat'])
     phi2 = math.radians(c2['lat'])
-    delta_lambda = math.radians(c1['long']-c2['long'])
+    delta_lambda = math.radians(c2['lng']-c1['lng'])
 
     y = math.sin(delta_lambda) * math.cos(phi2);
     x = math.cos(phi1) * math.sin(phi2) - math.sin(phi1) * math.cos(phi2) * math.cos(delta_lambda);
 
     return math.degrees(math.atan2(y, x))
+
