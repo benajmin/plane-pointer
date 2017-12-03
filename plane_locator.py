@@ -35,6 +35,9 @@ def get_closest_plane(location):
 
 
 def get_airport_city(icao):
+    if icao == '':
+        return icao
+
     url = 'https://v4p4sz5ijk.execute-api.us-east-1.amazonaws.com/anbdata/airports/locations/indicators-list?api_key=b4d2b410-d86a-11e7-a241-e5060cc78252&airports='
     url += icao
     response = json.loads(requests.get(url).text)
@@ -51,3 +54,41 @@ def bearing(plane, location):
     plane_location = {'lat': plane.get("Lat",0), 'lng': plane.get('Long', 0)}
     return geolocator.direction(location, plane_location)
 
+
+def parse_plane(plane):
+    result = dict()
+    if plane.get('Mil', False):
+        result['Op'] = 'Military'
+    else:
+        result['Op'] = plane.get('Op', '')[:16]
+
+    result['Dst'] = plane.get('Dst',0)
+    result['GAlt'] = plane.get('GAlt', 0)
+
+    # remove year at beginning of model
+    if plane.get('Mdl','')[0].isdigit():
+        result['Mdl'] = plane.get('Mdl', '')[5:21]
+    else:
+        result['Mdl'] = plane.get('Mdl', '')[:16]
+
+    p_to = get_airport_city(plane.get('To','')[:4])
+    p_from = get_airport_city(plane.get('From','')[:4])
+
+    # ensure both cities will fit on lcd
+    if len(p_to)+len(p_from) <= 15:
+        result['To'] = p_to
+        result['From'] = p_from
+    elif len(p_to) < 7:
+        result['To'] = p_to
+        result['From'] = p_from[:(15-len(p_to))]
+    elif len(p_from) < 7:
+        result['To'] = p_to[:(15-len(p_from))]
+        result['From'] = p_from
+    else:
+        result['To'] = p_to[:7]
+        result['From'] = p_from[:8]
+
+    return result
+
+
+print(parse_plane(get_closest_plane(geolocator.get_location())))
