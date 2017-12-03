@@ -1,6 +1,9 @@
 import requests
 import json
+import geolocator
+import math
 
+FEET_PER_KILOMETRE = 0.0003048
 
 # Returns list of planes withing radius km of location
 def get_planes(location, radius):
@@ -29,3 +32,14 @@ def get_closest_plane(location):
             closest_plane = i
 
     return closest_plane
+
+
+def alt_angle(plane):
+    angle = math.atan2(plane.get('GAlt',0)*FEET_PER_KILOMETRE,
+                       plane.get('Dst',0))
+    return math.degrees(angle)
+
+
+def bearing(plane, location):
+    plane_location = {'lat': plane.get("Lat",0), 'lng': plane.get('Long', 0)}
+    return geolocator.direction(location, plane_location)
