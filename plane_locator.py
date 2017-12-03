@@ -34,6 +34,13 @@ def get_closest_plane(location):
     return closest_plane
 
 
+def get_airport_city(icao):
+    url = 'https://v4p4sz5ijk.execute-api.us-east-1.amazonaws.com/anbdata/airports/locations/indicators-list?api_key=b4d2b410-d86a-11e7-a241-e5060cc78252&airports='
+    url += icao
+    response = json.loads(requests.get(url).text)
+    return response[0]['cityName']
+
+
 def alt_angle(plane):
     angle = math.atan2(plane.get('GAlt',0)*FEET_PER_KILOMETRE,
                        plane.get('Dst',0))
@@ -43,3 +50,4 @@ def alt_angle(plane):
 def bearing(plane, location):
     plane_location = {'lat': plane.get("Lat",0), 'lng': plane.get('Long', 0)}
     return geolocator.direction(location, plane_location)
+
