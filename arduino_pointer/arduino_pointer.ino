@@ -82,7 +82,7 @@ void serialEvent() {
   to = parse(serialData, "<To>", "<");
   from = parse(serialData, "<From>", "<");
 
-  alt =  parse(serialData, "<Alt>", "<").toInt();
+  alt =  parse(serialData, "<GAlt>", "<").toInt();
   dist =  parse(serialData, "<Dst>", "<").toFloat();
 
   int pitch = parse(serialData, "<Pitch>", "<").toInt();
